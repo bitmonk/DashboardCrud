@@ -23,40 +23,11 @@
 </head>
 
 <body class="">
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg position-absolute top-0 z-index-3 w-100 shadow-none my-3 navbar-transparent mt-4">
-    <div class="container">
-      <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 text-white" href="../pages/dashboard.html">
-        Admin Dashboard
-      </a>
-      <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon mt-2">
-          <span class="navbar-toggler-bar bar1"></span>
-          <span class="navbar-toggler-bar bar2"></span>
-          <span class="navbar-toggler-bar bar3"></span>
-        </span>
-      </button>
-      <div class="collapse navbar-collapse" id="navigation">
-        <ul class="navbar-nav mx-auto">
-          
-          <li class="nav-item">
-            <a class="nav-link me-2" href="../pages/sign-in.php">
-              <i class="fas fa-key opacity-6  me-1"></i>
-              Sign In
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
 
-  <!-- End Navbar -->
 
   <main class="main-content  mt-0">
     <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signup-cover.jpg'); background-position: top;">
       <span class="mask bg-gradient-dark opacity-6"></span>
-      
-      
       
       <div class="container">
         <div class="row justify-content-center">
@@ -72,8 +43,7 @@
           <div class="card z-index-0">
             
             <div class="row px-xl-5 px-sm-4 px-3">
-              
-              
+                            
               
             </div>
             <div class="card-body">
@@ -81,6 +51,8 @@
             <!-- Form Validation -->
 
             <?php
+
+            include("../database/config.php");
             
               if($_SERVER['REQUEST_METHOD'] == "POST"){
 
@@ -93,7 +65,6 @@
                 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
                 $pattern = '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\d\s]).{8,}$/';
 
-                $user = $_POST['username'];
 
 
                   $usernameError = $passwordError = $emptyError = "";
@@ -101,18 +72,29 @@
 
                   if(empty($_POST['first-name']) || empty($_POST['last-name']) || empty($_POST['username']) || empty($_POST['email']) || empty($_POST['password'])){
                     $emptyError = "Please enter all the details !";
-                  }
+                  }else{
 
-                    if(preg_match('/[^A-Za-z0-9]/', $user)){
+                     $sql = "SELECT * FROM users WHERE email = '$email'";
+                     $result = mysqli_query($conn, $sql);
+                     $user = mysqli_fetch_assoc($result);
+
+                        if ($user) {
+                          $emailError = "Email already exists!";
+                              header("Location: \dashboard\pages\sign-up.php");
+                          } else {
+
+                          if(preg_match('/[^A-Za-z0-9]/', $username)){
                                 $usernameError = "Username must not contain any spaces or special characters !";
                             }
-                            
-
-                      $passwordGood = preg_match($pattern, $password);
-                        if(!$passwordGood){
-                              $passwordError = "Password must have one uppercase letter, one lowercase letter, one number and one special character !";
+                          
+                            $passwordGood = preg_match($pattern, $password);
+                              if(!$passwordGood){
+                               $passwordError = "Password must have one uppercase letter, one lowercase letter, one number and one special character !";
                               }
-                              if(!($usernameError) && !($passwordError) && !($emptyError)){
+                            }
+                            
+                            
+                            if(!($usernameError) && !($passwordError) && !($emptyError)){
 
                                 include('../database/register.php');
              
@@ -121,20 +103,12 @@
                              }else{
                              echo "Data could'nt be inserted !";
                            }
-
-                        }else{
-                          echo "Form not submtted !";
+                          }
                         }
 
                         
 
                 }
-            
-
-              
-                
-              
-                
                   
                 // else{
                    

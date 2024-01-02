@@ -1,17 +1,3 @@
-<!--
-=========================================================
-* Argon Dashboard 2 - v2.0.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://www.creative-tim.com/license)
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
--->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,7 +7,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-    Argon Dashboard 2 by Creative Tim
+    Admin Dashboard
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -42,37 +28,6 @@
   <div class="container position-sticky z-index-sticky top-0">
     <div class="row">
       <div class="col-12">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg blur border-radius-lg top-0 z-index-3 shadow position-absolute mt-4 py-2 start-0 end-0 mx-4">
-          <div class="container-fluid">
-            <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 " href="../pages/dashboard.html">
-              Argon Dashboard 2
-            </a>
-            <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon mt-2">
-                <span class="navbar-toggler-bar bar1"></span>
-                <span class="navbar-toggler-bar bar2"></span>
-                <span class="navbar-toggler-bar bar3"></span>
-              </span>
-            </button>
-            <div class="collapse navbar-collapse" id="navigation">
-              <ul class="navbar-nav mx-auto">
-                
-                <li class="nav-item">
-                  <a class="nav-link me-2" href="../pages/sign-up.php">
-                    <i class="fas fa-user-circle opacity-6 text-dark me-1"></i>
-                    Sign Up
-                  </a>
-                </li>
-                
-              </ul>
-              <ul class="navbar-nav d-lg-block d-none">
-                
-              </ul>
-            </div>
-          </div>
-        </nav>
-        <!-- End Navbar -->
       </div>
     </div>
   </div>
@@ -95,20 +50,63 @@
                 <div class="card-body">
 
                 <!-- Main Form -->
+                <?php 
+                include("../database/config.php");
+                  if(isset($_POST['submit'])){
+                    $email = $_POST['email'];
+                    $password = $_POST['password'];
+
+                    $emptyError = "";
+                    $emailError = "";
+                    $passwordError ="";
+
+                    if(empty($email) || empty($password)){
+                      $emptyError = "Please enter your email and password first";
+                    }else{
+                      
+
+                      $sql = "SELECT * FROM users WHERE email = '$email'";
+
+                      $result = mysqli_query($conn, $sql);
+
+                      $user = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+                      if($user){
+                        if(password_verify($password, $user["password"])){
+                          header("Location: dashboard.php");
+                          die();
+
+                        }else{
+                          $passwordError = "Password Doesnot Match !";
+                          
+                        }
+                      }else{
+                        if(!$user){
+                          $emailError= "Email Doesnot Match !";
+                        }
+                      }
+                    }
+                  }
+                ?>
                 
-                  <form role="form" action="sign-in.php" method="post">
+                
+                  <form role="form" action="" method="post">
                     <div class="mb-3">
-                      <input type="email" class="form-control form-control-lg" placeholder="Email" aria-label="Email">
+                      <input type="email" name="email" class="form-control form-control-lg" placeholder="Email" aria-label="Email">
+                      
                     </div>
+                    <p style="color: red;"><?php if(!empty($emailError)){echo $emailError;}?><p>
                     <div class="mb-3">
-                      <input type="email" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+                      <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
                     </div>
+                    <p style="color: red;"><?php if(!empty($passwordError)){echo $passwordError;}?><p>
+                  
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" id="rememberMe">
                       <label class="form-check-label" for="rememberMe">Remember me</label>
                     </div>
                     <div class="text-center">
-                      <button type="button" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+                      <button type="submit" name="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
                     </div>
                   </form>
 
