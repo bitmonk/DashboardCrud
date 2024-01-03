@@ -123,7 +123,7 @@ if(mysqli_num_rows($fetch_query_run) > 0){
         $row = mysqli_fetch_assoc($fetch_query_run);
 ?>
   
-<a href="" class="nav-link text-white font-weight-bold px-0 dropdown-toggle">
+<a href="profile.php" class="nav-link text-white font-weight-bold px-0">
         <i class="fa fa-user me-sm-1"></i>
         <span class="d-sm-inline d-none"><?php echo $row['u_name'] ?></span>
       </a>
