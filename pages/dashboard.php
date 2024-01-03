@@ -1,17 +1,12 @@
-<!--
-=========================================================
-* Argon Dashboard 2 - v2.0.4
-=========================================================
+<?php session_start(); 
+$userprofile = $_SESSION['currentid'];
 
-* Product Page: https://www.creative-tim.com/product/argon-dashboard
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://www.creative-tim.com/license)
-* Coded by Creative Tim
+if($userprofile == true){
 
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
--->
+}else{
+  header("Location: sign-in.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,7 +16,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-    Argon Dashboard 2 by Creative Tim
+    Argon Dashboard
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -40,9 +35,9 @@
   <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
+      <a class="navbar-brand m-0" href="dashboard.php" target="_blank">
         <img src="../assets/img/logo-ct-dark.png" class="navbar-brand-img h-100" alt="main_logo">
-        <span class="ms-1 font-weight-bold">Argon Dashboard 2</span>
+        <span class="ms-1 font-weight-bold">Dashboard</span>
       </a>
     </div>
     <hr class="horizontal dark mt-0">
@@ -95,7 +90,8 @@
   </aside>
   <main class="main-content position-relative border-radius-lg ">
     <!-- Navbar -->
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+    
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
@@ -113,10 +109,35 @@
           </div>
           <ul class="navbar-nav  justify-content-end">
             <li class="nav-item d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0">
-                <i class="fa fa-user me-sm-1"></i>
-                <span class="d-sm-inline d-none">Sign In</span>
-              </a>
+
+          
+            <?php
+
+include_once("../database/config.php");
+
+
+$fetch_query = "SELECT * FROM users WHERE id = $userprofile";
+$fetch_query_run = mysqli_query($conn, $fetch_query);
+
+if(mysqli_num_rows($fetch_query_run) > 0){
+        $row = mysqli_fetch_assoc($fetch_query_run);
+?>
+  
+<a href="" class="nav-link text-white font-weight-bold px-0 dropdown-toggle">
+        <i class="fa fa-user me-sm-1"></i>
+        <span class="d-sm-inline d-none"><?php echo $row['u_name'] ?></span>
+      </a>
+
+      <?php
+}else{
+echo "User not found !";
+}
+?>
+
+
+
+
+              
             </li>
             <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-white p-0" id="iconNavbarSidenav">
@@ -128,9 +149,9 @@
               </a>
             </li>
             <li class="nav-item px-3 d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-white p-0">
+              <a class="nav-link text-white p-0">
                 <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
-              </a>
+              </a>  
             </li>
             <li class="nav-item dropdown pe-2 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-white p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -205,7 +226,11 @@
                 </li>
               </ul>
             </li>
-          </ul>
+            <li class="nav-item px-3 d-flex align-items-center">
+              <a class="nav-link text-white p-0" href="logout.php">
+                <i class="fa fa-sign-out fixed-plugin-button-nav cursor-pointer"></i>
+              </a>  
+            </li>
         </div>
       </div>
     </nav>

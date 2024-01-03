@@ -1,3 +1,8 @@
+<?php 
+if(session_status() === PHP_SESSION_NONE){
+   session_start();
+}
+ ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,7 +28,6 @@
 
 <body class="">
 
-<?php session_start(); ?>
 
   <div class="container position-sticky z-index-sticky top-0">
     <div class="row">
@@ -51,6 +55,10 @@
 
                 <!-- Main Form -->
                 <?php 
+
+                
+                
+
                 include("../database/config.php");
                   if(isset($_POST['submit'])){
                     $email = $_POST['email'];
@@ -69,11 +77,16 @@
 
                       $result = mysqli_query($conn, $sql);
 
-                      $user = mysqli_fetch_array($result, MYSQLI_ASSOC);
+                      $user = mysqli_fetch_array($result);
+
+                      $user_id = $user['id'];
+                    
 
                       if($user){
                         if(password_verify($password, $user["password"])){
+                          $_SESSION['currentid'] = $user_id;
                           header("Location: dashboard.php");
+
                           die();
 
                         }else{
@@ -179,7 +192,7 @@
           <?php
           unset($_SESSION['status']);
         }
-      ?>
+        ?>
 
       
 

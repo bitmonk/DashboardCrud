@@ -74,14 +74,7 @@
                     $emptyError = "Please enter all the details !";
                   }else{
 
-                     $sql = "SELECT * FROM users WHERE email = '$email'";
-                     $result = mysqli_query($conn, $sql);
-                     $user = mysqli_fetch_assoc($result);
-
-                        if ($user) {
-                          $emailError = "Email already exists!";
-                              header("Location: \dashboard\pages\sign-up.php");
-                          } else {
+                     
 
                           if(preg_match('/[^A-Za-z0-9]/', $username)){
                                 $usernameError = "Username must not contain any spaces or special characters !";
@@ -92,7 +85,7 @@
                                $passwordError = "Password must have one uppercase letter, one lowercase letter, one number and one special character !";
                               }
                             }
-                            
+                          }
                             
                             if(!($usernameError) && !($passwordError) && !($emptyError)){
 
@@ -100,15 +93,12 @@
              
                                 // include('../database/register.php');
                                
-                             }else{
-                             echo "Data could'nt be inserted !";
-                           }
+                             }
                           }
-                        }
+                        
 
                         
 
-                }
                   
                 // else{
                    
@@ -232,6 +222,7 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+  
   
 
 

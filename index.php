@@ -1,3 +1,13 @@
+<?php session_start(); 
+$userprofile = $_SESSION['currentid'];
+
+if($userprofile == true){
+
+}else{
+  header("Location: ./pages/sign-in.php");
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>

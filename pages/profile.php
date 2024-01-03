@@ -1,17 +1,10 @@
-<!--
-=========================================================
-* Argon Dashboard 2 - v2.0.4
-=========================================================
+<?php session_start(); 
+  if($_SESSION['currentid'] == true){
 
-* Product Page: https://www.creative-tim.com/product/argon-dashboard
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://www.creative-tim.com/license)
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
--->
+  }else{
+    header("Location: sign-in.php");
+  }
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,9 +35,9 @@
   <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
+      <a class="navbar-brand m-0" href="profile.php" target="_blank">
         <img src="../assets/img/logo-ct-dark.png" class="navbar-brand-img h-100" alt="main_logo">
-        <span class="ms-1 font-weight-bold">Argon Dashboard 2</span>
+        <span class="ms-1 font-weight-bold">Profile</span>
       </a>
     </div>
     <hr class="horizontal dark mt-0">
