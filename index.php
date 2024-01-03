@@ -337,6 +337,11 @@ if($userprofile == true){
                   </li>
                 </ul>
               </li>
+              <li class="nav-item px-3 d-flex align-items-center">
+              <a class="nav-link text-white p-0" href="./pages/logout.php">
+                <i class="fa fa-sign-out fixed-plugin-button-nav cursor-pointer"></i>
+              </a>  
+            </li>
             </ul>
           </div>
         </div>
