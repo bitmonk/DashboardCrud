@@ -1,9 +1,8 @@
-<?php session_start(); 
-  if($_SESSION['currentid'] == true){
-
-  }else{
-    header("Location: sign-in.php");
-  }
+<?php session_start();
+if ($_SESSION['currentid'] == true) {
+} else {
+  header("Location: sign-in.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,7 +58,7 @@
             <span class="nav-link-text ms-1">Tables</span>
           </a>
         </li>
-        
+
         <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
         </li>
@@ -89,7 +88,7 @@
         </li>
       </ul>
     </div>
-    
+
   </aside>
   <div class="main-content position-relative max-height-vh-100 h-100">
     <!-- Navbar -->
@@ -212,7 +211,7 @@
     <!-- End Navbar -->
 
 
-    
+
     <div class="card shadow-lg mx-4 card-profile-bottom">
       <div class="card-body p-3">
         <div class="row gx-4">
@@ -221,7 +220,7 @@
               <img src="../assets/img/team-1.jpg" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
             </div>
 
-            
+
           </div>
           <div class="col-auto my-auto">
             <div class="h-100">
@@ -261,7 +260,7 @@
       </div>
     </div>
 
-    
+
     <div class="container-fluid py-4">
       <div class="row">
         <div class="col-md-8">
@@ -271,173 +270,251 @@
                 <p class="mb-0">Edit Profile</p>
                 <button class="btn btn-primary btn-sm ms-auto">Settings</button>
               </div>
-              
+
             </div>
-
-
 
             <!-- Update Form Start -->
+
             <?php 
             include('../database/config.php');
+            if(isset($_POST['update-button'])){
+              $username = $_POST['username'];
+              $email = $_POST['email'];
+              $first_name = $_POST['first-name'];
+              $last_name = $_POST['last-name'];
 
-            if(isset($_SESSION['currentid']) && $_SESSION !== ""){
-              $sessionid = $_SESSION['currentid'];
-                if($_SESSION['currentid'] == true){
-                  $fetch_profile = "SELECT * FROM users WHERE id = '$sessionid'";
-                    $fetch_profile_run = mysqli_query($conn, $fetch_profile);
 
-                    $result = mysqli_fetch_array($fetch_profile_run, MYSQLI_ASSOC);
+              $image = $_FILE['image'];
+              $image_name = $_FILE['file']['name'];
+              $image_tmp_name = $_FILE['file']['tmp_name'];
+              $image_size = $_FILE['file']['size'];
+              $image_error = $_FILE['file']['error'];
+              $image_type = $_FILE['file']['type'];
+              $imageExt = explode('.', $image_name);
+              
+              $imageOgExt = strtolower(end($imageExt));
 
-                    if($result){
-                      
-                    }else{
-                      echo "Cannot retrieve data !";
-                    }
+              $allowed = array('jpg', 'jpeg', 'png');
 
+              if(in_array($imageOgExt, $allowed)){
+                if($image_error === 0){
+                  if(image_size < 100000){
+                    $image_new_name = uniqid('', true).".".$imageOgExt;
+                    $imgae_destination = 
+                  }else{
+                    echo "Your image size is too big !";
                   }
+
+                }else{
+                  echo "There was an error uploading the file !";
                 }
+
+              }else{
+                echo "File type not supported !";
+              }
+
+              $address = $_POST['address'];
+              $city = $_POST['city'];
+              $country = $_POST['country'];
+              $postal_code = $_POST['postal-code'];
+              $about_me = $_POST['about-me'];
+              $sessionid = $_SESSION['currentid'];
+
+              if(isset($username) || isset($email) || isset($first_name) || isset($last_name) || isset($address) || isset($city) || isset($country) || isset($postal_code) || isset($about_me)){
+
+                // $insert_query = "INSERT INTO users(address, city, country, postal_code, about_me) VALUES('$address', '$city', '$country', '$postal_code','$about_me')"; 
+                
+                
+                $update_query = "UPDATE users SET u_name = '$username', f_name = '$first_name', l_name = '$last_name', email = '$email', address ='$address', city = '$city', country = '$country', postal_code = $postal_code, about_me = '$about_me' WHERE id = '$sessionid'";   
+                
+                $update_query_run = mysqli_query($conn, $update_query);
+
+                if($update_query_run){
+                  $_SESSION['update'] = "Updated Successfully !";
+                }else{
+                  echo "Failed to update !";
+                }
+
+              }else{
+                echo "Fill in the changes first";
+              }
+
+             
+              
+            }else{
+              echo "Error";
+            }
+
+
+            ?>
+            <?php
+            
+
+            if (isset($_SESSION['currentid']) && $_SESSION !== "") {
+              
+              if ($_SESSION['currentid'] == true) {
+                $fetch_profile = "SELECT * FROM users WHERE id = '$sessionid'";
+                $fetch_profile_run = mysqli_query($conn, $fetch_profile);
+
+                $result = mysqli_fetch_array($fetch_profile_run, MYSQLI_ASSOC);
+
+                
+
+                if ($result) {
+                } else {
+                  echo "Cannot retrieve data !";
+                }
+              }
+            }
+            ?>
+            <?php
+
+            if (isset($_POST['update-button'])) {
+            } else {
+            }
+
             ?>
 
-           <form action="" method="post">
-            <div class="card-body">
-              <p class="text-uppercase text-sm">User Information</p>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Username</label>
-                    <input class="form-control" type="text" value="<?php echo $result['u_name']; ?>">
+            <form action="profile.php" method="post">
+              <div class="card-body">
+                <p class="text-uppercase text-sm">User Information</p>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Username</label>
+                      <input class="form-control" name="username" type="text" value="<?php echo $result['u_name']; ?>">
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Email address</label>
-                    <input class="form-control" type="email" value="<?php echo $result['email']; ?>">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Email address</label>
+                      <input class="form-control" name="email" type="email" value="<?php echo $result['email']; ?>">
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">First name</label>
-                    <input class="form-control" type="text" value="<?php echo $result['f_name']; ?>">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">First name</label>
+                      <input class="form-control" name="first-name" type="text" value="<?php echo $result['f_name']; ?>">
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Last name</label>
-                    <input class="form-control" type="text" value="<?php echo $result['l_name']; ?>">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Last name</label>
+                      <input class="form-control" name="last-name" type="text" value="<?php echo $result['l_name']; ?>">
+                    </div>
                   </div>
-                </div>
-                <div>
-              <label class="form-label" for="customFile">Change Image</label>
-            <input type="file" class="form-control" id="customFile" />
+                  <div>
+                    <label class="form-label" for="customFile">Change Image</label>
+                    <input type="file" name="image" class="form-control" id="customFile" />
 
-              </div>
-              </div>
-              <hr class="horizontal dark">
-              <p class="text-uppercase text-sm">Contact Information</p>
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Address</label>
-                    <input class="form-control" type="text" value="Address1">
                   </div>
                 </div>
-                <div class="col-md-4">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">City</label>
-                    <input class="form-control" type="text" value="New York">
+                <hr class="horizontal dark">
+                <p class="text-uppercase text-sm">Contact Information</p>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Address</label>
+                      <input class="form-control" name="address" type="text" value="<?php echo $result['address']; ?>">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">City</label>
+                      <input class="form-control" name="city" type="text" value="<?php echo $result['city']; ?>">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Country</label>
+                      <input class="form-control" name="country" type="text" value="<?php echo $result['country']; ?>">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Postal code</label>
+                      <input class="form-control" name="postal-code" type="text" value="<?php echo $result['postal_code']; ?>">
+                    </div>
                   </div>
                 </div>
-                <div class="col-md-4">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Country</label>
-                    <input class="form-control" type="text" value="United States">
+                <hr class="horizontal dark">
+                <p class="text-uppercase text-sm">About me</p>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">About me</label>
+                      <input class="form-control" type="text" name="about-me" value="<?php echo $result['about_me']; ?>">
+                    </div>
                   </div>
                 </div>
-                <div class="col-md-4">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">Postal code</label>
-                    <input class="form-control" type="text" value="437300">
-                  </div>
+                <div class="d-flex flex-row-reverse">
+                  <button type="submit" name="update-button" class="btn btn-success">Update</button>
                 </div>
               </div>
-              <hr class="horizontal dark">
-              <p class="text-uppercase text-sm">About me</p>
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">About me</label>
-                    <input class="form-control" type="text" value="A beautiful Dashboard for Bootstrap 5. It is Free and Open Source.">
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex flex-row-reverse">
-              <button type="submit" name="update-button" class="btn btn-success">Update</button>
-              </div>
-            </div>
-            
+
           </div>
         </div>
         </form>
+            
+        <!-- Update Form End -->
 
-      <!-- Update Form End -->
 
-
-        <div class="col-md-4">
-          <div class="card card-profile">
-            <img src="../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
-            <div class="row justify-content-center">
-              <div class="col-4 col-lg-4 order-lg-2">
-                <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                  <a href="javascript:;">
-                    <img src="../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="card-header text-center border-0 pt-0 pt-lg-2 pb-4 pb-lg-3">
-              <div class="d-flex justify-content-between">
-                <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-none d-lg-block">Connect</a>
-                <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-block d-lg-none"><i class="ni ni-collection"></i></a>
-                <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-none d-lg-block">Message</a>
-                <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-block d-lg-none"><i class="ni ni-email-83"></i></a>
-              </div>
-            </div>
-            <div class="card-body pt-0">
-              <div class="row">
-                <div class="col">
-                  <div class="d-flex justify-content-center">
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder">22</span>
-                      <span class="text-sm opacity-8">Friends</span>
-                    </div>
-                    <div class="d-grid text-center mx-4">
-                      <span class="text-lg font-weight-bolder">10</span>
-                      <span class="text-sm opacity-8">Photos</span>
-                    </div>
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder">89</span>
-                      <span class="text-sm opacity-8">Comments</span>
-                    </div>
+          <div class="col-md-4">
+            <div class="card card-profile">
+              <img src="../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
+              <div class="row justify-content-center">
+                <div class="col-4 col-lg-4 order-lg-2">
+                  <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
+                    <a href="javascript:;">
+                      <img src="../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
+                    </a>
                   </div>
                 </div>
               </div>
-              <div class="text-center mt-4">
-                <h5>
-                  Mark Davis<span class="font-weight-light">, 35</span>
-                </h5>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>Bucharest, Romania
+              <div class="card-header text-center border-0 pt-0 pt-lg-2 pb-4 pb-lg-3">
+                <div class="d-flex justify-content-between">
+                  <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-none d-lg-block">Connect</a>
+                  <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-block d-lg-none"><i class="ni ni-collection"></i></a>
+                  <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-none d-lg-block">Message</a>
+                  <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-block d-lg-none"><i class="ni ni-email-83"></i></a>
                 </div>
-                <div class="h6 mt-4">
-                  <i class="ni business_briefcase-24 mr-2"></i>Solution Manager - Creative Tim Officer
+              </div>
+              <div class="card-body pt-0">
+                <div class="row">
+                  <div class="col">
+                    <div class="d-flex justify-content-center">
+                      <div class="d-grid text-center">
+                        <span class="text-lg font-weight-bolder">22</span>
+                        <span class="text-sm opacity-8">Friends</span>
+                      </div>
+                      <div class="d-grid text-center mx-4">
+                        <span class="text-lg font-weight-bolder">10</span>
+                        <span class="text-sm opacity-8">Photos</span>
+                      </div>
+                      <div class="d-grid text-center">
+                        <span class="text-lg font-weight-bolder">89</span>
+                        <span class="text-sm opacity-8">Comments</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <i class="ni education_hat mr-2"></i>University of Computer Science
+                <div class="text-center mt-4">
+                  <h5>
+                    Mark Davis<span class="font-weight-light">, 35</span>
+                  </h5>
+                  <div class="h6 font-weight-300">
+                    <i class="ni location_pin mr-2"></i>Bucharest, Romania
+                  </div>
+                  <div class="h6 mt-4">
+                    <i class="ni business_briefcase-24 mr-2"></i>Solution Manager - Creative Tim Officer
+                  </div>
+                  <div>
+                    <i class="ni education_hat mr-2"></i>University of Computer Science
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
       </div>
       <footer class="footer pt-3  ">
         <div class="container-fluid">
@@ -473,7 +550,7 @@
       </footer>
     </div>
   </div>
- 
+
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
       <i class="fa fa-cog py-2"> </i>
@@ -554,10 +631,41 @@
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
   </script>
+  <script>if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}  </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Updated Animation -->
+  <?php
+        if(isset($_SESSION['update']) && $_SESSION['update'] != ""){
+
+          ?>
+
+      <script>
+
+        Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "<?php echo $_SESSION['update']; ?>",
+        showConfirmButton: false,
+        timer: 1500
+});
+
+      </script>
+
+
+
+          <?php
+          unset($_SESSION['update']);
+        }
+        ?>
+        <!-- updated animation end -->
+
 </body>
 
 </html>
