@@ -210,6 +210,9 @@
       </div>
     </nav>
     <!-- End Navbar -->
+
+
+    
     <div class="card shadow-lg mx-4 card-profile-bottom">
       <div class="card-body p-3">
         <div class="row gx-4">
@@ -217,6 +220,8 @@
             <div class="avatar avatar-xl position-relative">
               <img src="../assets/img/team-1.jpg" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
             </div>
+
+            
           </div>
           <div class="col-auto my-auto">
             <div class="h-100">
@@ -255,6 +260,8 @@
         </div>
       </div>
     </div>
+
+    
     <div class="container-fluid py-4">
       <div class="row">
         <div class="col-md-8">
@@ -264,34 +271,66 @@
                 <p class="mb-0">Edit Profile</p>
                 <button class="btn btn-primary btn-sm ms-auto">Settings</button>
               </div>
+              
             </div>
+
+
+
+            <!-- Update Form Start -->
+            <?php 
+            include('../database/config.php');
+
+            if(isset($_SESSION['currentid']) && $_SESSION !== ""){
+              $sessionid = $_SESSION['currentid'];
+                if($_SESSION['currentid'] == true){
+                  $fetch_profile = "SELECT * FROM users WHERE id = '$sessionid'";
+                    $fetch_profile_run = mysqli_query($conn, $fetch_profile);
+
+                    $result = mysqli_fetch_array($fetch_profile_run, MYSQLI_ASSOC);
+
+                    if($result){
+                      
+                    }else{
+                      echo "Cannot retrieve data !";
+                    }
+
+                  }
+                }
+            ?>
+
+           <form action="" method="post">
             <div class="card-body">
               <p class="text-uppercase text-sm">User Information</p>
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">Username</label>
-                    <input class="form-control" type="text" value="lucky.jesse">
+                    <input class="form-control" type="text" value="<?php echo $result['u_name']; ?>">
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">Email address</label>
-                    <input class="form-control" type="email" value="jesse@example.com">
+                    <input class="form-control" type="email" value="<?php echo $result['email']; ?>">
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">First name</label>
-                    <input class="form-control" type="text" value="Jesse">
+                    <input class="form-control" type="text" value="<?php echo $result['f_name']; ?>">
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">Last name</label>
-                    <input class="form-control" type="text" value="Lucky">
+                    <input class="form-control" type="text" value="<?php echo $result['l_name']; ?>">
                   </div>
                 </div>
+                <div>
+              <label class="form-label" for="customFile">Change Image</label>
+            <input type="file" class="form-control" id="customFile" />
+
+              </div>
               </div>
               <hr class="horizontal dark">
               <p class="text-uppercase text-sm">Contact Information</p>
@@ -299,7 +338,7 @@
                 <div class="col-md-12">
                   <div class="form-group">
                     <label for="example-text-input" class="form-control-label">Address</label>
-                    <input class="form-control" type="text" value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09">
+                    <input class="form-control" type="text" value="Address1">
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -331,9 +370,18 @@
                   </div>
                 </div>
               </div>
+              <div class="d-flex flex-row-reverse">
+              <button type="submit" name="update-button" class="btn btn-success">Update</button>
+              </div>
             </div>
+            
           </div>
         </div>
+        </form>
+
+      <!-- Update Form End -->
+
+
         <div class="col-md-4">
           <div class="card card-profile">
             <img src="../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
@@ -425,6 +473,7 @@
       </footer>
     </div>
   </div>
+ 
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
       <i class="fa fa-cog py-2"> </i>
