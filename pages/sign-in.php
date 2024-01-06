@@ -68,7 +68,7 @@ if(session_status() === PHP_SESSION_NONE){
                     $emailError = "";
                     $passwordError ="";
 
-                    if(empty($email) || empty($password)){
+                    if(empty($email) && empty($password)){
                       $emptyError = "Please enter your email and password first";
                     }else{
                       
@@ -78,6 +78,8 @@ if(session_status() === PHP_SESSION_NONE){
                       $result = mysqli_query($conn, $sql);
 
                       $user = mysqli_fetch_array($result);
+
+                      print_r($user);
 
                       $user_id = $user['id'];
                     

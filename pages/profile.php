@@ -284,23 +284,40 @@ if ($_SESSION['currentid'] == true) {
               $last_name = $_POST['last-name'];
 
 
-              $image = $_FILE['image'];
-              $image_name = $_FILE['file']['name'];
-              $image_tmp_name = $_FILE['file']['tmp_name'];
-              $image_size = $_FILE['file']['size'];
-              $image_error = $_FILE['file']['error'];
-              $image_type = $_FILE['file']['type'];
+              $image = $_FILES['image'];
+              $image_name = $_FILES['image']['name'];
+              $image_tmp_name = $_FILES['image']['tmp_name'];
+              $image_size = $_FILES['image']['size'];
+              $image_error = $_FILES['image']['error'];
+              $image_type = $_FILES['image']['type'];
               $imageExt = explode('.', $image_name);
-              
+
+            // $image_name_second = strtolower($image_name);
+            // $image_name_third = str_replace(' ','',$image_name_second);
+
+            // echo $image_name_third;
+              $address = $_POST['address'];
+              $city = $_POST['city'];
+              $country = $_POST['country'];
+              $postal_code = $_POST['postal-code'];
+              $about_me = $_POST['about-me'];
+              $sessionid = $_SESSION['currentid'];
+
+
               $imageOgExt = strtolower(end($imageExt));
 
               $allowed = array('jpg', 'jpeg', 'png');
 
               if(in_array($imageOgExt, $allowed)){
+                echo $_SESSION['currentid'];
+                $imageSession = $_SESSION['currentid'] - 1;
+                echo $imageSession;
                 if($image_error === 0){
-                  if(image_size < 100000){
+                  if($image_size < 5000000){
                     $image_new_name = uniqid('', true).".".$imageOgExt;
-                    $imgae_destination = 
+                    // $imgae_destination = 
+                    move_uploaded_file($_FILES['image']['tmp_name'],'uploads/'.$image_new_name);
+                      
                   }else{
                     echo "Your image size is too big !";
                   }
@@ -313,19 +330,12 @@ if ($_SESSION['currentid'] == true) {
                 echo "File type not supported !";
               }
 
-              $address = $_POST['address'];
-              $city = $_POST['city'];
-              $country = $_POST['country'];
-              $postal_code = $_POST['postal-code'];
-              $about_me = $_POST['about-me'];
-              $sessionid = $_SESSION['currentid'];
-
               if(isset($username) || isset($email) || isset($first_name) || isset($last_name) || isset($address) || isset($city) || isset($country) || isset($postal_code) || isset($about_me)){
 
                 // $insert_query = "INSERT INTO users(address, city, country, postal_code, about_me) VALUES('$address', '$city', '$country', '$postal_code','$about_me')"; 
                 
                 
-                $update_query = "UPDATE users SET u_name = '$username', f_name = '$first_name', l_name = '$last_name', email = '$email', address ='$address', city = '$city', country = '$country', postal_code = $postal_code, about_me = '$about_me' WHERE id = '$sessionid'";   
+                $update_query = "UPDATE users SET u_name = '$username', f_name = '$first_name', l_name = '$last_name', email = '$email', image = '$image_new_name', address ='$address', city = '$city', country = '$country', postal_code = $postal_code, about_me = '$about_me' WHERE id = '$sessionid'";   
                 
                 $update_query_run = mysqli_query($conn, $update_query);
 
@@ -341,14 +351,11 @@ if ($_SESSION['currentid'] == true) {
 
              
               
-            }else{
-              echo "Error";
             }
-
 
             ?>
             <?php
-            
+            $sessionid = $_SESSION['currentid'];
 
             if (isset($_SESSION['currentid']) && $_SESSION !== "") {
               
@@ -375,7 +382,7 @@ if ($_SESSION['currentid'] == true) {
 
             ?>
 
-            <form action="profile.php" method="post">
+            <form action="profile.php" method="post" enctype="multipart/form-data">
               <div class="card-body">
                 <p class="text-uppercase text-sm">User Information</p>
                 <div class="row">
