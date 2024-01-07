@@ -68,39 +68,41 @@ if(session_status() === PHP_SESSION_NONE){
                     $emailError = "";
                     $passwordError ="";
 
-                    if(empty($email) && empty($password)){
-                      $emptyError = "Please enter your email and password first";
-                    }else{
-                      
 
                       $sql = "SELECT * FROM users WHERE email = '$email'";
 
                       $result = mysqli_query($conn, $sql);
 
-                      $user = mysqli_fetch_array($result);
+                      if($result){
+                        $user = mysqli_fetch_array($result);
 
-                      print_r($user);
+                        if($user !== null){
+                        $user_id = $user['id'];
+                        print_r($user_id);
 
-                      $user_id = $user['id'];
-                    
+                        if($user){
+                          if(password_verify($password, $user["password"])){
+                            $_SESSION['currentid'] = $user_id;
+                            header("Location: dashboard.php");
 
-                      if($user){
-                        if(password_verify($password, $user["password"])){
-                          $_SESSION['currentid'] = $user_id;
-                          header("Location: dashboard.php");
+                            die();
 
-                          die();
-
-                        }else{
+                           }else{
                           $passwordError = "Password Doesnot Match !";
                           
                         }
-                      }else{
-                        if(!$user){
-                          $emailError= "Email Doesnot Match !";
+
+
+                        }else{
+                          echo "Email Empty !";
                         }
+                        
+                      }else{
+                        
+                          $emailError= "Email Doesnot Match !";
                       }
-                    }
+                        
+                      }
                   }
                 ?>
                 
@@ -171,7 +173,11 @@ if(session_status() === PHP_SESSION_NONE){
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
+<script>
+  if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
   <?php
         if(isset($_SESSION['status']) && $_SESSION['status'] != ""){
 

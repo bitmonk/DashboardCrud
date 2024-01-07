@@ -6,6 +6,7 @@
     header("Location: sign-in.php");
   }
 ?>
+<?php include_once('../database/config.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -248,7 +249,7 @@
                       </td>
                       <td class="align-middle">
                         <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
+                          Delete
                         </a>
                       </td>
                     </tr>
@@ -276,7 +277,7 @@
                       </td>
                       <td class="align-middle">
                         <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
+                          Delete
                         </a>
                       </td>
                     </tr>
@@ -304,7 +305,7 @@
                       </td>
                       <td class="align-middle">
                         <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
+                          Delete
                         </a>
                       </td>
                     </tr>
@@ -332,7 +333,7 @@
                       </td>
                       <td class="align-middle">
                         <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
+                          Delete
                         </a>
                       </td>
                     </tr>
@@ -360,7 +361,7 @@
                       </td>
                       <td class="align-middle">
                         <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
+                          Delete
                         </a>
                       </td>
                     </tr>
@@ -388,7 +389,7 @@
                       </td>
                       <td class="align-middle">
                         <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                          Edit
+                          Delete
                         </a>
                       </td>
                     </tr>
