@@ -74,8 +74,6 @@
                     $emptyError = "Please enter all the details !";
                   }else{
 
-                     
-
                           if(preg_match('/[^A-Za-z0-9]/', $username)){
                                 $usernameError = "Username must not contain any spaces or special characters !";
                             }

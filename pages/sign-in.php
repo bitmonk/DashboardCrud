@@ -78,15 +78,19 @@ if(session_status() === PHP_SESSION_NONE){
 
                         if($user !== null){
                         $user_id = $user['id'];
-                        print_r($user_id);
+                        
 
                         if($user){
                           if(password_verify($password, $user["password"])){
                             $_SESSION['currentid'] = $user_id;
-                            header("Location: dashboard.php");
 
+                            if($user['user_type'] == 'admin'){
+
+                            header("Location: admin-dashboard.php");
                             die();
-
+                            }else{
+                              header("Location: dashboard.php");
+                            }
                            }else{
                           $passwordError = "Password Doesnot Match !";
                           
@@ -184,7 +188,6 @@ if(session_status() === PHP_SESSION_NONE){
           ?>
 
       <script>
-
         Swal.fire({
         position: "top-end",
         icon: "<?php echo $_SESSION['status-code']; ?>",
