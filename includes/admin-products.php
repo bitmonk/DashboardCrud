@@ -25,7 +25,7 @@
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Products</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Price</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Stock</th>
-                      <th class="text-secondary opacity-7"></th>
+                      <th class="text-secondary opacity-7">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -91,6 +91,9 @@
 
                          <form action="" method="post">
                                 <input type="hidden" name="productToDelete" value="<?php echo $productId; ?>">
+                                <button type="submit" name="editProduct" class="btn btn-link text-secondary font-weight-bold text-xs">
+                                <a href='admin-edit-product.php?id=<?php echo $productId; ?>'>Edit</a>
+                                </button>
                                 <button type="submit" name="deleteProduct" class="btn btn-link text-secondary font-weight-bold text-xs" onclick="window.location.reload()">
                                     Delete
                                 </button>
