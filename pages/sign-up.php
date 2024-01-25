@@ -1,3 +1,10 @@
+<?php 
+
+if(session_status() === PHP_SESSION_NONE){
+   session_start();
+}
+
+ ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,13 +29,12 @@
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
 </head>
 
+
 <body class="">
-
-
   <main class="main-content  mt-0">
     <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signup-cover.jpg'); background-position: top;">
       <span class="mask bg-gradient-dark opacity-6"></span>
-      
+
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-5 text-center mx-auto">
@@ -55,23 +61,25 @@
             include("../database/config.php");
             
               if($_SERVER['REQUEST_METHOD'] == "POST"){
+                $usernameError = $passwordError = $emptyError = $emailError = "";
 
                 if(isset($_POST['submit'])){
                 $fName = $_POST['first-name'];
                 $lName = $_POST['last-name'];
                 $username = $_POST['username'];
-                $email = $_POST['email'];
+                $email = isset($_POST['email']) ? $_POST['email'] : "";
                 $password = $_POST['password'];
                 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
                 $pattern = '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\d\s]).{8,}$/';
+                $otp = random_int(100000, 999999);
 
-
-
-                  $usernameError = $passwordError = $emptyError = "";
+                  
 
 
                   if(empty($_POST['first-name']) || empty($_POST['last-name']) || empty($_POST['username']) || empty($_POST['email']) || empty($_POST['password'])){
                     $emptyError = "Please enter all the details !";
+                  
+                  
                   }else{
 
                           if(preg_match('/[^A-Za-z0-9]/', $username)){
@@ -84,25 +92,56 @@
                               }
                             }
                           }
-                            
+
                             if(!($usernameError) && !($passwordError) && !($emptyError)){
-
-                                include('../database/register.php');
-             
-                                // include('../database/register.php');
                                
-                             }
+                              $email = isset($_POST['email']) ? $_POST['email'] : "";
+
+
+
+
+                              
+                                $fetch_query = "SELECT * FROM users WHERE email = '$email'";
+    
+                                  $fetch_query_run = mysqli_query($conn, $fetch_query);
+    
+                                  if($fetch_query_run){
+                                    
+                                    $result = mysqli_fetch_array($fetch_query_run, MYSQLI_ASSOC);
+
+                                    if($result){
+
+                                      $emailRow = $result['email'];
+                                    
+
+                                    if($emailRow){
+
+                                    $emailError = "Email Already Exists !";
+
+                                    }else{
+                                    
+                                      
+                                    }
+                                    }else{
+                                      include('../database/register.php');
+                                    
+                                      include('../send-mail.php');
+                                    
+                                      $_SESSION['user_email'] = $email;
+                                    }
+                                    
+                                    
+                                  }else{
+                                    echo "Failed to fetch Data";
+
+
+                                    
+                                  }
+                              // unset($_POST['submit']);
+                            }
                           }
-              
-                // else{
-                   
-                //   include('../database/config.php');
 
-                //   include('../database/register.php');
-
-                // }
-
-            ?>
+                            ?>
 
               <form role="form" action="sign-up.php" method="post">
               <div class="mb-3">
@@ -114,10 +153,11 @@
                 <div class="mb-3">
                   <input type="text" class="form-control" placeholder="Username" name="username" aria-label="Name">
                 </div>
-                <?php if(isset($usernameError)){echo "<div class='text-danger small'>$usernameError</div>";} ?>
+                <?php if(isset($usernameError)){echo "<div class='text-danger small'>$usernameError</div>";}?>
                 <div class="mb-3">
                   <input type="email" class="form-control" placeholder="Email" name="email" aria-label="Email">
                 </div>
+                <?php if(isset($emailError)){echo "<div class='text-danger small' role='alert'>$emailError</div>";}?>
                 <div class="mb-3">
                   <input type="password" class="form-control" placeholder="Password" name="password" aria-label="Password">
                 </div>
@@ -144,62 +184,84 @@
       </div>
     </div>
   </main>
-  <!-- -------- START FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
-  <footer class="footer py-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 mb-4 mx-auto text-center">
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
-            Company
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
-            About Us
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
-            Team
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
-            Products
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
-            Blog
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
-            Pricing
-          </a>
-        </div>
-        <div class="col-lg-8 mx-auto text-center mb-4 mt-2">
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-4 me-4">
-            <span class="text-lg fab fa-dribbble"></span>
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-4 me-4">
-            <span class="text-lg fab fa-twitter"></span>
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-4 me-4">
-            <span class="text-lg fab fa-instagram"></span>
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-4 me-4">
-            <span class="text-lg fab fa-pinterest"></span>
-          </a>
-          <a href="javascript:;" target="_blank" class="text-secondary me-xl-4 me-4">
-            <span class="text-lg fab fa-github"></span>
-          </a>
+
+<!-- otp container -->
+
+<div class="otp-container">
+        <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
+        <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
+          <div class="otp-wrapper z-index-0" id="otp-wrapper">
+
+            <div class="otp-body">
+
+            <!-- Form Validation -->
+
+            <?php 
+              include_once('../database/config.php');
+              $verificationError = "";
+              if(isset($_POST['verify'])){
+
+              $otp = $_POST['otp'];
+              $user_email = $_SESSION['user_email'];
+
+              
+              $fetch_all = "SELECT * FROM users WHERE email = '$user_email'";
+
+              $fetch_all_run = mysqli_query($conn, $fetch_all);
+
+              $result = mysqli_fetch_array($fetch_all_run, MYSQLI_ASSOC);
+              
+              $otpRow = $result['otp'];
+              $verification = $result['verification'];
+
+              if($otpRow == $otp){
+                $verify = "UPDATE users SET verification = '1' WHERE email = '$user_email'";
+
+                $verify_query = mysqli_query($conn, $verify);
+
+                if($verify_query){
+                  $verificationError = "Successfully verified !";
+                }else{
+                  $verificationError = "failed to verify";
+                }
+
+                
+
+              }else{
+                $verificationError = "OTP didnot match !";
+              }
+
+              }
+            ?>
+           
+              <form role="form" action="" method="post">
+
+              <div class="mb-3">
+                  <label for="otp">Please Enter your OTP from your email.</label>
+                  <input type="text" class="form-control" name="otp" placeholder="Enter your OTP" aria-label="otp">
+                </div>
+                
+                  <div><?php echo $verificationError;  ?></div>
+                   
+                  <button type="submit" name="verify" class="btn btn-primary w-100 my-4 mb-2">Verify</button>
+                  <button class="btn btn-outline-danger w-100 my-4 mb-2" onclick="cancelHandle()">Cancel</button>
+                </div>
+
+              </form>
+            
+              <!-- Main Form End -->
+
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-8 mx-auto text-center mt-1">
-          <p class="mb-0 text-secondary">
-            Copyright © <script>
-              document.write(new Date().getFullYear())
-            </script> Soft by Creative Tim.
-          </p>
-        </div>
-      </div>
+     
     </div>
-  </footer>
-  <!-- -------- END FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
+
+
+
   <!--   Core JS Files   -->
-  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/popper.min.js"></>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
@@ -221,8 +283,42 @@
   window.history.replaceState( null, null, window.location.href );
 }
 </script>
+
+<script>
   
 
+    function otpPopup(){
+    var otpBox = document.getElementById('otp-wrapper');
+    otpBox.style.display = 'flex';  
+  }
+
+  function cancelHandle(){
+    var otpBox = document.getElementById('otp-wrapper');
+    otpBox.style.display = 'none';
+  }
+</script>
+  
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<?php
+        if(isset($_SESSION['otp']) && $_SESSION['otp'] != ""){
+
+          ?>
+
+      <script>
+      Swal.fire({
+      text: "An OTP verification code has been sent to your email address. Please enter your OTP code for verification",
+      icon: "success"
+    });
+
+      </script>
+
+
+
+          <?php
+          unset($_SESSION['otp']);
+        }
+        ?>
 
 </body>
 

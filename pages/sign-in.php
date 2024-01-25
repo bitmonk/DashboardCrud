@@ -37,8 +37,6 @@ if(session_status() === PHP_SESSION_NONE){
   </div>
   <main class="main-content  mt-0">
     <section>
-    
-    
       <div class="page-header min-vh-100">
         <div class="container">
           <div class="row">
@@ -46,8 +44,6 @@ if(session_status() === PHP_SESSION_NONE){
               <div class="card card-plain">
                 <div class="card-header pb-0 text-start">
 
-
-                
                   <h4 class="font-weight-bolder">Sign In</h4>
                   <p class="mb-0">Enter your email and password to sign in</p>
                 </div>
@@ -79,7 +75,6 @@ if(session_status() === PHP_SESSION_NONE){
                         if($user !== null){
                         $user_id = $user['id'];
                         
-
                         if($user){
                           if(password_verify($password, $user["password"])){
                             $_SESSION['currentid'] = $user_id;
@@ -88,12 +83,12 @@ if(session_status() === PHP_SESSION_NONE){
 
                             header("Location: admin-dashboard.php");
                             die();
+
                             }else{
                               header("Location: dashboard.php");
                             }
                            }else{
                           $passwordError = "Password Doesnot Match !";
-                          
                         }
 
 
@@ -114,12 +109,13 @@ if(session_status() === PHP_SESSION_NONE){
                   <form role="form" action="" method="post">
                     <div class="mb-3">
                       <input type="email" name="email" class="form-control form-control-lg" placeholder="Email" aria-label="Email">
-                      
                     </div>
+
                     <p style="color: red;"><?php if(!empty($emailError)){echo $emailError;}?><p>
                     <div class="mb-3">
                       <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
                     </div>
+                    
                     <p style="color: red;"><?php if(!empty($passwordError)){echo $passwordError;}?><p>
                   
                     <div class="form-check form-switch">
@@ -162,6 +158,7 @@ if(session_status() === PHP_SESSION_NONE){
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script>
+
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
       var options = {
@@ -169,6 +166,7 @@ if(session_status() === PHP_SESSION_NONE){
       }
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
+
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -177,39 +175,14 @@ if(session_status() === PHP_SESSION_NONE){
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  
+
 <script>
   if ( window.history.replaceState ) {
   window.history.replaceState( null, null, window.location.href );
 }
+
 </script>
-  <?php
-        if(isset($_SESSION['status']) && $_SESSION['status'] != ""){
-
-          ?>
-
-      <script>
-        Swal.fire({
-        position: "top-end",
-        icon: "<?php echo $_SESSION['status-code']; ?>",
-        title: "<?php echo $_SESSION['status']; ?>",
-        showConfirmButton: false,
-        timer: 1500
-});
-
-      </script>
-
-
-
-          <?php
-          unset($_SESSION['status']);
-        }
-        ?>
-
-      
-
-
-
-
 </body>
 
 </html>
