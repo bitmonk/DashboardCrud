@@ -1,8 +1,8 @@
 <?php 
-
 if(session_status() === PHP_SESSION_NONE){
    session_start();
 }
+
 
  ?>
 <!DOCTYPE html>
@@ -25,6 +25,9 @@ if(session_status() === PHP_SESSION_NONE){
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+
 
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
 </head>
@@ -58,9 +61,15 @@ if(session_status() === PHP_SESSION_NONE){
 
             <?php
 
+if(isset($_SESSION['verified']) && $_SESSION['verified'] != ""){
+  header("Location: sign-in.php");
+}else{
+}
+
             include("../database/config.php");
             
               if($_SERVER['REQUEST_METHOD'] == "POST"){
+
                 $usernameError = $passwordError = $emptyError = $emailError = "";
 
                 if(isset($_POST['submit'])){
@@ -91,7 +100,7 @@ if(session_status() === PHP_SESSION_NONE){
                                $passwordError = "Password must have one uppercase letter, one lowercase letter, one number and one special character !";
                               }
                             }
-                          }
+
 
                             if(!($usernameError) && !($passwordError) && !($emptyError)){
                                
@@ -114,31 +123,36 @@ if(session_status() === PHP_SESSION_NONE){
                                       $emailRow = $result['email'];
                                     
 
-                                    if($emailRow){
+                                      if($emailRow){
 
-                                    $emailError = "Email Already Exists !";
+                                       $emailError = "Email Already Exists !";
 
                                     }else{
-                                    
-                                      
+
                                     }
+                                    
                                     }else{
+
+                                      // header("Location: sign-up.php");
+
                                       include('../database/register.php');
                                     
                                       include('../send-mail.php');
                                     
                                       $_SESSION['user_email'] = $email;
+
+                                      
                                     }
                                     
                                     
                                   }else{
                                     echo "Failed to fetch Data";
-
-
                                     
                                   }
-                              // unset($_POST['submit']);
+                              
                             }
+                          }
+                            // unset($_POST['submit']);
                           }
 
                             ?>
@@ -159,7 +173,8 @@ if(session_status() === PHP_SESSION_NONE){
                 </div>
                 <?php if(isset($emailError)){echo "<div class='text-danger small' role='alert'>$emailError</div>";}?>
                 <div class="mb-3">
-                  <input type="password" class="form-control" placeholder="Password" name="password" aria-label="Password">
+                  <input type="password" class="form-control" placeholder="Password" id="password" name="password" aria-label="Password">
+                  <i class="bi bi-eye-slash" id="togglePasswordd"></i>
                 </div>
                 <?php if(isset($passwordError)){echo "<div class='text-danger text-center small'>$passwordError</div>";} ?>
                 <?php if(isset($emptyError)){echo "<div class='text-danger small' role='alert'>$emptyError</div>";}?>
@@ -198,53 +213,76 @@ if(session_status() === PHP_SESSION_NONE){
 
             <?php 
               include_once('../database/config.php');
-              $verificationError = "";
+              $eror = "";
               if(isset($_POST['verify'])){
 
-              $otp = $_POST['otp'];
-              $user_email = $_SESSION['user_email'];
+                  $userOtp = $_POST['otp'];
 
-              
-              $fetch_all = "SELECT * FROM users WHERE email = '$user_email'";
-
-              $fetch_all_run = mysqli_query($conn, $fetch_all);
-
-              $result = mysqli_fetch_array($fetch_all_run, MYSQLI_ASSOC);
-              
-              $otpRow = $result['otp'];
-              $verification = $result['verification'];
-
-              if($otpRow == $otp){
-                $verify = "UPDATE users SET verification = '1' WHERE email = '$user_email'";
-
-                $verify_query = mysqli_query($conn, $verify);
-
-                if($verify_query){
-                  $verificationError = "Successfully verified !";
-                }else{
-                  $verificationError = "failed to verify";
-                }
-
+                  $sql = "SELECT * FROM users WHERE otp = '$userOtp'";
                 
+                  $sql_query = mysqli_query($conn, $sql);
 
+                  if($sql_query){
+                    $result = mysqli_fetch_array($sql_query, MYSQLI_ASSOC);
+
+                    $eror = print_r($result);
+
+                    if (isset($result) && is_array($result) && array_key_exists('otp', $result)) {
+                      if ($result['otp'] == $userOtp) {
+                          $verify = "UPDATE users SET verification = 1 WHERE otp = '$userOtp'";
+                          $verify_query = mysqli_query($conn, $verify);
+                  
+                          if ($verify_query) {
+                              $_SESSION['verified'] = 'You are successfully Verified !';
+                              
+                          } else {
+                              $_SESSION['unverified'] = 'Failed to verify OTP';
+                              header("Location: sign-in.php");
+                              exit(); // Exit here as well
+                          }
+                      } else {
+                          
+                      }
+                  } else {
+                    $_SESSION['unverified'] = 'Failed to verify OTP';
+                  }
+                  
               }else{
-                $verificationError = "OTP didnot match !";
+                // $verificationError = "OTP didnot match !";
+              }
+            }
+
+            if(isset($_POST['resend'])){
+              $otp = random_int(100000, 999999);
+              $email = $_SESSION['user_email'];
+              $sql = "UPDATE users SET otp = '$otp' WHERE email = '$email'";
+              $sql_query = mysqli_query($conn, $sql);
+
+              if($sql_query){
+                $_SESSION['resendOk'] = 'OTP Resent !'; 
+              }else{
+                $_SESSION['resendError'] = 'OTP Resend Failed !';
               }
 
-              }
+              include('../send-mail.php');
+            }
             ?>
+
+
            
-              <form role="form" action="" method="post">
+
+
+              <form role="form" action="sign-up.php" method="post">
 
               <div class="mb-3">
                   <label for="otp">Please Enter your OTP from your email.</label>
                   <input type="text" class="form-control" name="otp" placeholder="Enter your OTP" aria-label="otp">
                 </div>
-                
-                  <div><?php echo $verificationError;  ?></div>
+                <a id="expiry-div"> Resend another code in : <div id="timer"></div></a>
+                  <button type="submit" name="resend" id = "resendBtn" class="btn btn-link">Resend</button>
                    
-                  <button type="submit" name="verify" class="btn btn-primary w-100 my-4 mb-2">Verify</button>
-                  <button class="btn btn-outline-danger w-100 my-4 mb-2" onclick="cancelHandle()">Cancel</button>
+                  <button type="submit" name="verify" class="btn btn-primary w-100 my-4 mb-2" onclick="otpPopup();">Verify</button>
+                  <button type="button" class="btn btn-outline-danger w-100 my-4 mb-2" onclick="cancelHandle()">Cancel</button>
                 </div>
 
               </form>
@@ -257,7 +295,6 @@ if(session_status() === PHP_SESSION_NONE){
       </div>
      
     </div>
-
 
 
   <!--   Core JS Files   -->
@@ -298,6 +335,39 @@ if(session_status() === PHP_SESSION_NONE){
   }
 </script>
   
+<script>
+  let resendButton = document.getElementById('resendBtn');
+  resendButton.style.display = 'none';
+function startCountdown(durationInSeconds) {
+  let timerElement = document.getElementById('timer');
+  let timerDiv = document.getElementById('expiry-div');
+
+  function updateTimerDisplay(timeRemaining) {
+    let minutes = Math.floor(timeRemaining / 60);
+    let seconds = timeRemaining % 60;
+    timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  function countdown() {
+    if (durationInSeconds > 0) {
+      updateTimerDisplay(durationInSeconds);
+      durationInSeconds--;
+    } else {
+      clearInterval(timerInterval);
+      timerDiv.style.display = 'none';
+      resendButton.style.display = 'flex';
+    }
+  }
+
+  countdown(); // Initial call to display the timer immediately
+
+  let timerInterval = setInterval(countdown, 1000); // Update every second
+}
+
+// Example: Start a countdown for 5 minutes (300 seconds)
+startCountdown(5);
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <?php
@@ -310,7 +380,6 @@ if(session_status() === PHP_SESSION_NONE){
       text: "An OTP verification code has been sent to your email address. Please enter your OTP code for verification",
       icon: "success"
     });
-
       </script>
 
 
@@ -318,8 +387,113 @@ if(session_status() === PHP_SESSION_NONE){
           <?php
           unset($_SESSION['otp']);
         }
+
+
+        if(isset($_SESSION['verified']) && $_SESSION['verified'] != ""){
+
+          ?>
+
+        <script>
+        Swal.fire({
+        text: "Successfully Verified",
+        icon: "success"
+        });
+
+        window.location.href = "sign-in.php";
+
+        </script>
+          <?php
+          // unset($_SESSION['verified']);
+        }
+        
+
+
+
+        if(isset($_SESSION['unverified']) && $_SESSION['unverified'] != ""){
+
+          ?>
+
+      <script>
+      Swal.fire({
+      text: "Wrong OTP Code !",
+      icon: "error"
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+      otpPopup();
+    });
+      </script>
+
+
+
+          <?php
+          unset($_SESSION['unverified']);
+        }
+
+
+        if(isset($_SESSION['resendOk']) && $_SESSION['resendOk'] != ""){
+
+          ?>
+
+      <script>
+      Swal.fire({
+      text: "Resend Successful !",
+      icon: "success"
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+      otpPopup();
+    });
+      </script>
+
+
+
+          <?php
+          unset($_SESSION['resendOk']);
+        }
+        if(isset($_SESSION['resendError']) && $_SESSION['resendError'] != ""){
+
+          ?>
+
+      <script>
+      Swal.fire({
+      text: "Resend Failed !",
+      icon: "error"
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+      otpPopup();
+    });
+      </script>
+
+
+
+          <?php
+          unset($_SESSION['resendError']);
+        }
+
         ?>
 
+
+
+<script>
+        const togglePassword = document
+            .querySelector('#togglePasswordd');
+        const password = document.querySelector('#password');
+        togglePassword.addEventListener('click', () => {
+            // Toggle the type attribute using
+            // getAttribure() method
+            const type = password
+                .getAttribute('type') === 'password' ?
+                'text' : 'password';
+            password.setAttribute('type', type);
+            // Toggle the eye and bi-eye icon
+            this.classList.toggle('bi-eye');
+        });
+    </script>
 </body>
 
 </html>

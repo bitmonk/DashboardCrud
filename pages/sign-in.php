@@ -1,7 +1,9 @@
 <?php 
+
 if(session_status() === PHP_SESSION_NONE){
    session_start();
 }
+
  ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +26,8 @@ if(session_status() === PHP_SESSION_NONE){
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
 </head>
 
 <body class="">
@@ -50,60 +54,75 @@ if(session_status() === PHP_SESSION_NONE){
                 <div class="card-body">
 
                 <!-- Main Form -->
-                <?php 
+                <?php
+include_once('../database/config.php');
 
-                
-                
+$emailError = $passwordError = "";
 
-                include("../database/config.php");
-                  if(isset($_POST['submit'])){
-                    $email = $_POST['email'];
-                    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
-                    $emptyError = "";
-                    $emailError = "";
-                    $passwordError ="";
+    if(isset($_POST['submit'])){
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $_SESSION['s_email'] = $_POST['email'];
+    $sql = "SELECT * FROM users WHERE email = '$email'";
+    $result = mysqli_query($conn, $sql);
 
+    if ($result) {
+        $user = mysqli_fetch_array($result);
 
-                      $sql = "SELECT * FROM users WHERE email = '$email'";
+        if ($user !== null) {
+            $user_id = $user['id'];
 
-                      $result = mysqli_query($conn, $sql);
+            if ($user) {
+                if ($user['verification'] == 1) {
+                    if (password_verify($password, $user["password"])) {
+                        $_SESSION['currentid'] = $user_id;
 
-                      if($result){
-                        $user = mysqli_fetch_array($result);
-
-                        if($user !== null){
-                        $user_id = $user['id'];
-                        
-                        if($user){
-                          if(password_verify($password, $user["password"])){
-                            $_SESSION['currentid'] = $user_id;
-
-                            if($user['user_type'] == 'admin'){
-
+                        if ($user['user_type'] == 'admin') {
                             header("Location: admin-dashboard.php");
                             die();
-
-                            }else{
-                              header("Location: dashboard.php");
-                            }
-                           }else{
-                          $passwordError = "Password Doesnot Match !";
+                        } else {
+                            header("Location: dashboard.php");
                         }
+                    } else {
+                        $passwordError = "Password Does not Match!";
+                    }
+                } else {
+                  $_SESSION['u_email'] = $email; 
+                  $_SESSION['notVerified'] = 'true';
 
-
-                        }else{
-                          echo "Email Empty !";
-                        }
-                        
-                      }else{
-                        
-                          $emailError= "Email Doesnot Match !";
-                      }
-                        
-                      }
+                  $otp = random_int(100000, 999999);
+                  $email = $_SESSION['u_email'];
+                  $sql = "UPDATE users SET otp = '$otp' WHERE email = '$email'";
+                  $sql_query = mysqli_query($conn, $sql);
+                  if($sql_query){
+                    include('../send-mail.php');
+                  }else{
+                    $_SESSION['error'] = 'Error';
                   }
-                ?>
+                  
+
+                  echo '<script>';
+                  echo '    document.addEventListener("DOMContentLoaded", function() {';
+                  echo 'otpPopup();';
+                  echo '    });';
+                  echo '</script>';
+
+                }
+            } else {
+                echo "Email Empty!";
+            }
+        } else {
+            $emailError = "Email Does not Match!";
+        }
+    } else {
+        echo "Error fetching user data: " . mysqli_error($conn);
+    }
+    }
+  }
+    ?>
+
                 
                 
                   <form role="form" action="" method="post">
@@ -113,7 +132,8 @@ if(session_status() === PHP_SESSION_NONE){
 
                     <p style="color: red;"><?php if(!empty($emailError)){echo $emailError;}?><p>
                     <div class="mb-3">
-                      <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+                      <input type="password" name="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+                      <i class="bi bi-eye-slash" id="togglePassword"></i>
                     </div>
                     
                     <p style="color: red;"><?php if(!empty($passwordError)){echo $passwordError;}?><p>
@@ -151,7 +171,103 @@ if(session_status() === PHP_SESSION_NONE){
         </div>
       </div>
     </section>
+
+    <div class="otp-container">
+        <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
+        <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
+          <div class="otp-wrapper z-index-9" id="otp-wrapper">
+
+            <div class="otp-body">
+
+            <!-- Form Validation -->
+
+            <?php 
+              include_once('../database/config.php');
+              $eror = "";
+              $u_email = $_SESSION['u_email'];
+
+              if (isset($_POST['verify'])) {
+                $userOtp = $_POST['otp'];
+            
+                $sql = "SELECT * FROM users WHERE otp = '$userOtp'";
+                
+                $sql_query = mysqli_query($conn, $sql);
+            
+                if ($sql_query) {
+                    $result = mysqli_fetch_array($sql_query, MYSQLI_ASSOC);
+            
+                    if ($result !== null && $result['otp'] == $userOtp) {
+                        $verify = "UPDATE users SET verification = 1 WHERE otp = '$userOtp'";
+                        $verify_query = mysqli_query($conn, $verify);
+            
+                        if ($verify_query) {
+                            $_SESSION['verified'] = 'You are successfully Verified !';
+                        } else {
+                            $_SESSION['unverified'] = 'Failed to update verification status';
+                            header("Location: sign-in.php");
+                            exit();
+                        }
+                    } else {
+                        $_SESSION['unverified'] = 'Failed to verify OTP';
+                    }
+                } else {
+                    $_SESSION['unverified'] = 'Failed to execute the query';
+                }
+            }
+
+            if(isset($_POST['resend'])){
+              $otp = random_int(100000, 999999);
+              $email = $_SESSION['s_email'];
+              $sql = "UPDATE users SET otp = '$otp' WHERE email = '$email'";
+              $sql_query = mysqli_query($conn, $sql);
+
+              if($sql_query){
+                include('../send-mail.php');
+                $_SESSION['resendOk'] = 'OTP Resent !'; 
+              }else{
+                $_SESSION['resendError'] = 'OTP Resend Failed !';
+              }
+
+              
+            }
+            ?>
+
+
+           
+
+
+              <form role="form" action="sign-in.php" method="post">
+
+              <div class="mb-3">
+                  <label for="otp">Please Enter your OTP from your email.</label>
+                  <input type="text" class="form-control" name="otp" placeholder="Enter your OTP" aria-label="otp">
+                </div>
+                <a id="expiry-div"> Resend another code in : <div id="timer"></div></a>
+                  <button type="submit" name="resend" id = "resendBtn" class="btn btn-link">Resend</button>
+                   
+                  <button type="submit" name="verify" class="btn btn-primary w-100 my-4 mb-2" onclick="otpPopup();">Verify</button>
+                  <button type="button" class="btn btn-outline-danger w-100 my-4 mb-2" onclick="cancelHandle()">Cancel</button>
+                </div>
+
+              </form>
+            
+              <!-- Main Form End -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+     
+    </div>
+
   </main>
+
+
+
+
+
+
+
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
@@ -175,14 +291,165 @@ if(session_status() === PHP_SESSION_NONE){
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <script>
+  
+
+  function otpPopup(){
+  var otpBox = document.getElementById('otp-wrapper');
+  otpBox.style.display = 'flex';  
+}
+
+function cancelHandle(){
+  var otpBox = document.getElementById('otp-wrapper');
+  otpBox.style.display = 'none';
+}
+</script>
   
 
 <script>
   if ( window.history.replaceState ) {
   window.history.replaceState( null, null, window.location.href );
 }
+</script>
+
+<?php
+if(isset($_SESSION['verified']) && $_SESSION['verified'] != ""){
+
+?>
+
+<script>
+Swal.fire({
+text: "Successfully Verified",
+icon: "success"
+});
 
 </script>
+<?php
+unset($_SESSION['verified']);
+}
+
+
+
+
+
+
+
+// var_dump($_SESSION['unverified']);
+if(isset($_SESSION['unverified']) && $_SESSION['unverified'] != ""){
+
+?>
+
+<script>
+Swal.fire({
+text: "OTP Code doesnot match !",
+icon: "error"
+});
+document.addEventListener("DOMContentLoaded", function() {
+
+otpPopup();
+});
+</script>
+<?php
+unset($_SESSION['unverified']);
+}
+
+
+
+if(isset($_SESSION['notVerified']) && $_SESSION['notVerified'] != ""){
+
+?>
+
+<script>
+Swal.fire({
+text: "You are not verified yet. An OTP has been sent to your Email. Please verify to login !",
+icon: "error"
+});
+
+</script>
+<?php
+unset($_SESSION['notVerified']);
+}
+
+
+
+
+if(isset($_SESSION['resendOk']) && $_SESSION['resendOk'] != ""){
+
+?>
+
+<script>
+Swal.fire({
+text: "An OTP has been sent to your Email !",
+icon: "success"
+});
+// window.location.href = "sign-in.php";
+document.addEventListener("DOMContentLoaded", function() {
+
+otpPopup();
+});
+
+</script>
+<?php
+unset($_SESSION['resendOk']);
+}
+
+
+
+
+
+?>
+
+<script>
+  let resendButton = document.getElementById('resendBtn');
+  resendButton.style.display = 'none';
+function startCountdown(durationInSeconds) {
+  let timerElement = document.getElementById('timer');
+  let timerDiv = document.getElementById('expiry-div');
+
+  function updateTimerDisplay(timeRemaining) {
+    let minutes = Math.floor(timeRemaining / 60);
+    let seconds = timeRemaining % 60;
+    timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  function countdown() {
+    if (durationInSeconds > 0) {
+      updateTimerDisplay(durationInSeconds);
+      durationInSeconds--;
+    } else {
+      clearInterval(timerInterval);
+      timerDiv.style.display = 'none';
+      resendButton.style.display = 'flex';
+    }
+  }
+
+  countdown(); // Initial call to display the timer immediately
+
+  let timerInterval = setInterval(countdown, 1000); // Update every second
+}
+
+// Example: Start a countdown for 5 minutes (300 seconds)
+startCountdown(5);
+</script>
+
+
+<script>
+        const togglePassword = document
+            .querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        togglePassword.addEventListener('click', () => {
+            // Toggle the type attribute using
+            // getAttribure() method
+            const type = password
+                .getAttribute('type') === 'password' ?
+                'text' : 'password';
+            password.setAttribute('type', type);
+            // Toggle the eye and bi-eye icon
+            this.classList.toggle('bi-eye');
+        });
+    </script>
+
+
 </body>
 
 </html>

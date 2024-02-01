@@ -1,5 +1,4 @@
 <?php
-    session_start();
     
     include('config.php');
         
@@ -12,16 +11,15 @@
             if($query) {
                 $_SESSION['status'] = "You are registered successfully !";
                 $_SESSION['status-code'] = "success";
-                $_SESSION['otp'] = "";
+                $_SESSION['otp'] = "yes";
 
                 // echo "<script>";
                 // echo "otpPopup();";
                 // echo "</script>";
-
                  // Replace this with your actual condition
 
                               if ($isRegistered == '0') {
-                                echo '<script>';
+                              echo '<script>';
                               echo '    document.addEventListener("DOMContentLoaded", function() {';
                               echo 'otpPopup();';
                               echo '    });';

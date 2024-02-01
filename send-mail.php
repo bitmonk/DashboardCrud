@@ -13,16 +13,16 @@ require '../vendor/autoload.php';
 
 try {
     //Server settings
-
     $mail = new PHPMailer(true);
                    //Enable verbose debug output
     $mail->isSMTP();                                            //Send using SMTP
     $mail->Host       = 'sandbox.smtp.mailtrap.io';                     //Set the SMTP server to send through
     $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = 'fec9452fa6feea';                     //SMTP username
-    $mail->Password   = '97a9cb52b51531';                               //SMTP password
+    $mail->Username   = '002826e93bc80e';                     //SMTP username
+    $mail->Password   = '740ffa6c05676d';                               //SMTP password
     $mail->SMTPSecure = 'tls';          //Enable implicit TLS encryption
     $mail->Port       = 2525;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
 
     //Recipients
     $mail->setFrom('from@example.com', 'Mailer');
